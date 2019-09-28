@@ -1,0 +1,49 @@
+                                       Driver Class
+
+
+package BigData;
+
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.*;
+import org.apache.hadoop.mapred.*;
+
+public class SalesCountryDriver {
+	
+    public static void main(String[] args) {
+    	
+        Client my_client = new Client();
+
+        // Create a configuration object for the job
+        JobConf Conf = new JobConf(SalesCountryDriver.class);
+
+        // Set a name of the Job
+        Conf.setJobName("SoldInEachCountry");
+
+        // Specify data type of output key and value
+        Conf.setOutputKeyClass(Text.class);
+        Conf.setOutputValueClass(IntWritable.class);
+
+        // Specify names of Mapper and Reducer Class
+        Conf.setMapperClass(SalesCountry.SalesMap.class);
+        Conf.setReducerClass(SalesCountry.SalesCountryReducer.class);
+
+        // Specify formats of the data type of Input and output
+        Conf.setInputFormat(TextInputFormat.class);
+        Conf.setOutputFormat(TextOutputFormat.class);
+
+        // Set input and output directories using command line arguments, 
+        //arg[0] = name of input directory on HDFS, and arg[1] =  name of output directory to be created to store the output file.
+
+        FileInputFormat.setInputPaths(Conf, new Path(args[0]));
+        FileOutputFormat.setOutputPath(Conf, new Path(args[1]));
+
+        my_client.setConf(Conf);
+        try {
+            // Run the job 
+            Client.runJob(Conf);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
